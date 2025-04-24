@@ -2,137 +2,95 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MBTI 궁합 감성 이미지 생성기</title>
   <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 600px;
-    }
-    h1 {
-      text-align: center;
-      font-size: 1.5rem;
-    }
-    label {
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 0.5rem;
-    }
-    button {
-      padding: 0.75rem 1.5rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      width: 100%;
-      font-size: 1rem;
-      margin-top: 1rem;
-    }
-    .result {
-      margin-top: 2rem;
-      text-align: center;
-    }
-    img {
-      max-width: 100%;
-      border-radius: 1rem;
-      margin-top: 1rem;
-    }
-    .quote {
-      font-style: italic;
-      margin-top: 1rem;
-      color: #555;
-    }
-    .actions {
-      margin-top: 1rem;
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
+    body { font-family: 'Arial', sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+    h2 { color: #2c4ecf; }
+    select, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+    .result { margin-top: 20px; }
+    .hearts { font-size: 20px; color: red; }
+    .image-preview { margin-top: 10px; text-align: center; }
+    .image-preview img { max-width: 100%; border-radius: 12px; }
+    .emotion { font-weight: bold; color: #555; margin-top: 10px; }
+    .buttons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>❤️ MBTI 궁합 감성 이미지 생성기</h1>
-    <label for="mbti1">당신의 MBTI:</label>
-    <input type="text" id="mbti1" placeholder="예: INFP">
-    <label for="mbti2">상대의 MBTI:</label>
-    <input type="text" id="mbti2" placeholder="예: ENFJ">
-    <button onclick="generateImage()">✨ 이미지 생성하기</button>
+  <div class="container">
+    <h2><strong>MBTI 궁합 테스트 ✨ 감성 이미지 스타일 선택</strong></h2>
 
-    <div id="result" class="result"></div>
+    <label for="mbti1">나의 MBTI</label>
+    <select id="mbti1"></select>
+
+    <label for="mbti2">상대의 MBTI</label>
+    <select id="mbti2"></select>
+
+    <label for="style">감성 이미지 스타일</label>
+    <select id="style">
+      <option value="line-art">라인 아트 (line-art)</option>
+      <option value="watercolor">수채화 (watercolor)</option>
+      <option value="ghibli">지브리풍 (ghibli style)</option>
+    </select>
+
+    <button onclick="generateMatch()">궁합 보기</button>
+
+    <div class="result" id="result"></div>
   </div>
 
   <script>
-    let currentImageUrl = null;
+    const mbtis = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP",
+                    "ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
 
-    function buildPrompt(m1, m2) {
-      return `A Ghibli-style illustration of a ${m1} and ${m2} couple having tea under cherry blossoms, dreamy atmosphere, cinematic light`;
+    const select1 = document.getElementById('mbti1');
+    const select2 = document.getElementById('mbti2');
+    mbtis.forEach(mbti => {
+      select1.innerHTML += `<option value="${mbti}">${mbti}</option>`;
+      select2.innerHTML += `<option value="${mbti}">${mbti}</option>`;
+    });
+
+    function generateMatch() {
+      const mbti1 = select1.value;
+      const mbti2 = select2.value;
+      const style = document.getElementById('style').value;
+
+      const score = Math.floor(Math.random() * 6) + 5; // 5~10점 랜덤
+      const hearts = '❤️'.repeat(score) + '🤍'.repeat(10 - score);
+      const messages = [
+        "두 사람은 서로를 보완하며 성장할 수 있어요.",
+        "서로 다른 점이 오히려 매력 포인트!",
+        "비슷한 성향으로 깊은 교감을 나눌 수 있어요.",
+        "어쩌면 처음엔 다툼도, 하지만 시간이 답이에요.",
+        "운명적인 케미, 영화 속 주인공처럼 어울려요!"
+      ];
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+
+      const prompt = `${style} illustration of ${mbti1} and ${mbti2} couple`;
+      const imgUrl = `https://dummyimage.com/512x512/eeeeee/000000&text=${mbti1}+%E2%9D%A4+${mbti2}`;
+
+      document.getElementById('result').innerHTML = `
+        <p><strong>궁합 점수:</strong> <span class="hearts">${hearts}</span></p>
+        <p class="emotion">${msg}</p>
+        <div class="image-preview">
+          <img src="${imgUrl}" alt="MBTI 감성 이미지" />
+        </div>
+        <div class="buttons">
+          <button onclick="copyImageUrl('${imgUrl}')">공유</button>
+          <button onclick="downloadImage('${imgUrl}')">다운로드</button>
+        </div>
+      `;
     }
 
-    async function generateImage() {
-      const mbti1 = document.getElementById("mbti1").value.trim().toUpperCase();
-      const mbti2 = document.getElementById("mbti2").value.trim().toUpperCase();
-      const prompt = buildPrompt(mbti1, mbti2);
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "<p>⚡️ 이미지 생성 중입니다...</p>";
-
-      try {
-        const res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2", {
-          method: "POST",
-          headers: {
-            Authorization: "Bearer hf_your_huggingface_token_here",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ inputs: prompt })
-        });
-        const blob = await res.blob();
-        currentImageUrl = URL.createObjectURL(blob);
-
-        resultDiv.innerHTML = `
-          <img src="${currentImageUrl}" alt="Generated Image">
-          <div class="quote">“${mbti1}와 ${mbti2}는 서로를 포용하며 함께 성장하는 관계입니다.”</div>
-          <div class="actions">
-            <button onclick="downloadImage()">⭳ 이미지 저장</button>
-            <button onclick="copyLink()">🔗 링크 복사</button>
-          </div>
-        `;
-      } catch (err) {
-        console.error(err);
-        resultDiv.innerHTML = "<p style='color:red;'>❌ 이미지 생성 실패. 다시 시도해 주세요.</p>";
-      }
+    function copyImageUrl(url) {
+      navigator.clipboard.writeText(url).then(() => alert("이미지 주소가 복사되었습니다!"));
     }
 
-    function downloadImage() {
-      const a = document.createElement("a");
-      a.href = currentImageUrl;
-      a.download = "mbti-couple.png";
+    function downloadImage(url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mbti-image.png';
       a.click();
-    }
-
-    function copyLink() {
-      navigator.clipboard.writeText(currentImageUrl).then(() => {
-        alert("이미지 링크가 복사되었습니다!");
-      });
     }
   </script>
 </body>
