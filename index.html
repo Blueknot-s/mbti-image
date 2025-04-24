@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>MBTI 궁합 감성 이미지 생성기</title>
+</head>
+<body>
+  <h1>MBTI 궁합 감성 이미지 생성기</h1>
+  <label>당신의 MBTI: <input id="mbti1" /></label><br />
+  <label>상대의 MBTI: <input id="mbti2" /></label><br /><br />
+  <button onclick="generateImage()">궁합 이미지 생성하기</button>
+  <div id="result" style="margin-top:20px;"></div>
+
+  <script>
+    function buildPrompt(mbti1, mbti2) {
+      return `A Ghibli-style illustration of a ${mbti1} and ${mbti2} couple having tea in a cozy cafe with cherry blossoms outside, cinematic lighting, dreamy atmosphere`;
+    }
+
+    async function generateImage() {
+      const mbti1 = document.getElementById("mbti1").value.trim().toUpperCase();
+      const mbti2 = document.getElementById("mbti2").value.trim().toUpperCase();
+      const prompt = buildPrompt(mbti1, mbti2);
+      document.getElementById("result").innerHTML = "이미지 생성 중...";
+
+      try {
+        const response = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer hf_your_huggingface_token_here",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ inputs: prompt })
+        });
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        document.getElementById("result").innerHTML = `<p><strong>프롬프트:</strong> ${prompt}</p><img src="${url}" width="300"/>`;
+
+      } catch (err) {
+        console.error("에러:", err);
+        document.getElementById("result").innerHTML = "<p style='color:red;'>❌ 이미지 생성 실패</p>";
+      }
+    }
+  </script>
+</body>
+</html>
