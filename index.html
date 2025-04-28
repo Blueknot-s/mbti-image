@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,15 +8,13 @@
     body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
     .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; max-width: 600px; margin: auto; }
     h1 { color: #2349c4; }
-    select, button { width: 100%; padding: 10px; margin: 10px 0; }
+    select, button, textarea { width: 100%; padding: 10px; margin: 10px 0; }
     #result { margin-top: 20px; text-align: center; }
-    .hearts { font-size: 24px; color: red; }
-    .image-container img { max-width: 100%; border-radius: 10px; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1><strong>MBTI 궁합 테스트 ✨ 감성 이미지 스타일 선택</strong></h1>
+  <h1><strong>MBTI 궁합 테스트 ✨</strong></h1>
 
   <label for="myMbti">나의 MBTI</label>
   <select id="myMbti">
@@ -29,7 +26,7 @@
     <option disabled selected>선택하세요</option>
   </select>
 
-  <label for="style">감성 이미지 스타일</label>
+  <label for="style">감성 스타일 선택</label>
   <select id="style">
     <option value="line-art">라인 아트 (line-art)</option>
     <option value="ghibli">지브리 스타일 (ghibli)</option>
@@ -42,62 +39,53 @@
 </div>
 
 <script>
-  const mbtiList = [
-    'INFP','ENFP','INFJ','ENFJ','INTP','ENTP','INTJ','ENTJ',
-    'ISFP','ESFP','ISFJ','ESFJ','ISTP','ESTP','ISTJ','ESTJ'
-  ];
+const mbtiList = [
+  'INFP','ENFP','INFJ','ENFJ','INTP','ENTP','INTJ','ENTJ',
+  'ISFP','ESFP','ISFJ','ESFJ','ISTP','ESTP','ISTJ','ESTJ'
+];
 
-  const myMbti = document.getElementById("myMbti");
-  const partnerMbti = document.getElementById("partnerMbti");
-  mbtiList.forEach(type => {
-    myMbti.innerHTML += `<option value="${type}">${type}</option>`;
-    partnerMbti.innerHTML += `<option value="${type}">${type}</option>`;
-  });
+const myMbti = document.getElementById("myMbti");
+const partnerMbti = document.getElementById("partnerMbti");
 
-  // 공유 및 다운로드 가능하도록 기능 추가
-  function runMatchTest() {
-    const my = myMbti.value;
-    const partner = partnerMbti.value;
-    const style = document.getElementById("style").value;
-    const key = `${my}_${partner}`;
+mbtiList.forEach(type => {
+  myMbti.innerHTML += `<option value="${type}">${type}</option>`;
+  partnerMbti.innerHTML += `<option value="${type}">${type}</option>`;
+});
 
-    const resultDiv = document.getElementById("result");
-    if (!emotionDB[key]) {
-      resultDiv.innerHTML = "<p>😢 아직 준비되지 않은 궁합 조합입니다.</p>";
-      return;
-    }
+function runMatchTest() {
+  const my = myMbti.value;
+  const partner = partnerMbti.value;
+  const style = document.getElementById("style").value;
+  const key = `${my}_${partner}`;
 
-    const result = emotionDB[key];
-    const hearts = "❤️".repeat(result.score) + "🤍".repeat(5 - result.score);
-    const imageUrl = `https://via.placeholder.com/300x300?text=${my}+%E2%9D%A4+${partner}`;
-
-    resultDiv.innerHTML = `
-      <div class="hearts">${hearts}</div>
-      <p><strong>${result.message}</strong></p>
-      <p>${result.description}</p>
-      <div class="image-container">
-        <img id="generatedImage" src="${imageUrl}" alt="감성 이미지" />
-      </div>
-      <button onclick="downloadImage('${imageUrl}')">⬇️ 이미지 다운로드</button>
-      <button onclick="copyLink('${imageUrl}')">🔗 공유하기</button>
-    `;
+  const resultDiv = document.getElementById("result");
+  if (!emotionDB[key]) {
+    resultDiv.innerHTML = "<p>😢 아직 준비되지 않은 궁합 조합입니다.</p>";
+    return;
   }
 
-  function downloadImage(url) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'mbti-image.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
+  const result = emotionDB[key];
+  const prompt = `Create an emotional illustration representing the relationship between an ${my} and ${partner}. Style: ${style}.`;
 
-  function copyLink(url) {
-    navigator.clipboard.writeText(url).then(() => {
-      alert("✅ 이미지 링크가 복사되었습니다!");
-    });
-  }
+  resultDiv.innerHTML = `
+    <p><strong>궁합 점수: ${result.score * 20}점</strong></p>
+    <p><strong>${result.message}</strong></p>
+    <p>${result.description}</p>
+    <h3>🎨 ChatGPT로 감성 이미지 만들기</h3>
+    <textarea readonly>${prompt}</textarea>
+    <button onclick="copyPrompt()">프롬프트 복사하기</button>
+  `;
+}
+
+function copyPrompt() {
+  const textarea = document.querySelector("#result textarea");
+  textarea.select();
+  document.execCommand('copy');
+  alert('✅ 프롬프트가 복사되었습니다! ChatGPT에 붙여넣어 사용해보세요.');
+}
 </script>
+
+<!-- emotionDB 스크립트는 기존 전체 256개 데이터를 여기에 추가합니다 -->
 
 <!-- 여기에 emotionDB 전체 데이터 삽입 -->
   <script>
